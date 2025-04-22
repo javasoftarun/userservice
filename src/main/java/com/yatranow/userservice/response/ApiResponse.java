@@ -1,16 +1,14 @@
 package com.yatranow.userservice.response;
 
-import com.yatranow.userservice.entity.User;
-
 public class ApiResponse {
 	
 	private String responseMessage;
-	private User responseData;
+	private Object[] responseData;
 	private int responseCode;
 	
-	public ApiResponse(String responseMessage, User responseData, int responseCode) {
+	public ApiResponse(String responseMessage, Object[] objects, int responseCode) {
 		this.responseMessage = responseMessage;
-		this.responseData = responseData;
+		this.responseData = objects;
 		this.responseCode = responseCode;
 	}
 
@@ -22,11 +20,11 @@ public class ApiResponse {
 		this.responseMessage = responseMessage;
 	}
 
-	public User getResponseData() {
+	public Object[] getResponseData() {
 		return responseData;
 	}
 
-	public void setResponseData(User responseData) {
+	public void setResponseData(Object[] responseData) {
 		this.responseData = responseData;
 	}
 

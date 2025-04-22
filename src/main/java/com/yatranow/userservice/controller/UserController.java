@@ -1,5 +1,7 @@
 package com.yatranow.userservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class UserController {
     public ResponseEntity<ApiResponse> registerUser(@RequestBody User user) {
         System.out.println("Registering user: " + user.toString());
         User registeredUser = userService.registerUser(user);
-        return ResponseEntity.ok(new ApiResponse("success", registeredUser, HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
     }
    	
     
@@ -50,7 +52,14 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserById(@PathVariable("id") Long id) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return ResponseEntity.ok(new ApiResponse("success", user, HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ApiResponse("success", new Object[] { user }, HttpStatus.OK.value()));
+    }
+    
+    @GetMapping("/all")
+    @Operation(summary = "Get user by ID", description = "Retrieves a user by their ID")
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        List<User> user = ( userService.findAllUsers());
+        return ResponseEntity.ok(new ApiResponse("success", user.toArray(), HttpStatus.OK.value()));
     }
 	/**
 	 * Deletes a user by their ID.
@@ -69,12 +78,11 @@ public class UserController {
     @Operation(summary = "Update user details", description = "Updates the user details based on JSON input")
     public ResponseEntity<ApiResponse> updateUserRole(@RequestBody User user) {
         try {
-            User updatedUser = userService.updateUserDetails(user)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            User updatedUser = userService.updateUserDetails(user);
 
-            return ResponseEntity.ok(new ApiResponse("success", updatedUser, HttpStatus.OK.value()));
+            return ResponseEntity.ok(new ApiResponse("success", new Object[] {updatedUser}, HttpStatus.OK.value()));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON input", e);
+        	return ResponseEntity.status(500).body(new ApiResponse(e.getMessage(), null, 500));
         }
     }
 

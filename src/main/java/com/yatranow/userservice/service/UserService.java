@@ -1,5 +1,6 @@
 package com.yatranow.userservice.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,30 +68,22 @@ public class UserService {
 	 * @throws JsonMappingException if there is an error mapping JSON to the User object
 	 * @throws JsonProcessingException if there is an error processing JSON
 	 */
-	public Optional<User> updateUserDetails(User user) throws JsonMappingException, JsonProcessingException {
-	    Long id = 0L;
-	    // Extract user details from JSON
-	    if (user.getId() > 0) {
-	        id = user.getId();
-	    } else {
-	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID is required");
-	    }
+	public User updateUserDetails(User user) throws JsonMappingException, JsonProcessingException {
+	    
+		return userRepository.findById(user.getId()).map(existingUser -> {
+			System.out.println("1111111");
+			existingUser.setName(user.getName());
+			existingUser.setEmail(user.getEmail());
+			existingUser.setPhone(user.getPhone());
+			existingUser.setImageUrl(user.getImageUrl());
+			userRepository.save(existingUser);
+			return existingUser;
+			}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		}
 
-	    return userRepository.findById(id).map(updatedUser -> {
-	        if (user.getName() != null) {
-	        	updatedUser.setName(user.getName());
-	        }
-	        if (user.getEmail() != null) {
-	        	updatedUser.setEmail(user.getEmail());
-	        }
-	        if (user.getRole() != null) {
-	        	updatedUser.setRole(user.getRole());
-	        }
-	        if (user.getPhone() != null) {
-	        	updatedUser.setPhone(user.getPhone());
-	        }
-	        return userRepository.save(updatedUser);
-	    });
+	public List<User> findAllUsers() {
+		
+		return userRepository.findAll();
 	}
 
 }

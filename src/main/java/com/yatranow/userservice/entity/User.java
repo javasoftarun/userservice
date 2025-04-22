@@ -15,6 +15,7 @@ public class User {
     private String phone;
     private String role;
     private boolean verified;
+    private String imageUrl;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -100,6 +101,14 @@ public class User {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 }
 
