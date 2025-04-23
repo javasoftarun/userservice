@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.yatranow.userservice.config.CommonUtils;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.UserRepository;
 
@@ -26,12 +25,19 @@ public class UserService {
 	 * @return the registered user
 	 */
 	public User registerUser(User user) {
-		if (userRepository.existsByEmail(user.getEmail())) {
-			throw new IllegalArgumentException("Email is already in use");
+		if (userRepository.existsByPhone(user.getPhone())) {
+			throw new IllegalArgumentException("Mobile is already in use");
 		}
 
-		// Encrypt the password using SHA-1
-		user.setPassword(CommonUtils.encryptPassword(user.getPassword()));
+		if(!user.getRole().equalsIgnoreCase("USER") && !user.getRole().equalsIgnoreCase("VENDOR")) {
+			user.setPassword(user.getPassword());
+		}
+		if (user.getRole().equalsIgnoreCase("ADMIN")) {
+			if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().length() < 8) {
+				throw new IllegalArgumentException("Password is required for admin role");
+			}
+			user.setPassword(user.getPassword());
+		}
 
 		return userRepository.save(user);
 	}
@@ -71,10 +77,8 @@ public class UserService {
 	public User updateUserDetails(User user) throws JsonMappingException, JsonProcessingException {
 	    
 		return userRepository.findById(user.getId()).map(existingUser -> {
-			System.out.println("1111111");
 			existingUser.setName(user.getName());
 			existingUser.setEmail(user.getEmail());
-			existingUser.setPhone(user.getPhone());
 			existingUser.setImageUrl(user.getImageUrl());
 			userRepository.save(existingUser);
 			return existingUser;
@@ -84,6 +88,13 @@ public class UserService {
 	public List<User> findAllUsers() {
 		
 		return userRepository.findAll();
+	}
+
+	public Optional<User> getUserByMobile(String mobile) {
+		if (!userRepository.existsByPhone(mobile)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+		}
+		return userRepository.findByPhone(mobile);
 	}
 
 }

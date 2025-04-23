@@ -85,5 +85,13 @@ public class UserController {
         	return ResponseEntity.status(500).body(new ApiResponse(e.getMessage(), null, 500));
         }
     }
+    
+    @GetMapping("/find/{mobile}")
+    @Operation(summary = "Get user by mobile", description = "Retrieves a user by their mobile number")
+    public ResponseEntity<ApiResponse> getUserByMobile(@PathVariable("mobile") String mobile) {
+		User user = userService.getUserByMobile(mobile)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		return ResponseEntity.ok(new ApiResponse("success", new Object[] { user }, HttpStatus.OK.value()));
+    }
 
 }
