@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
-@RequestMapping("/api/otp")
+@RequestMapping("/api/users/otp")
 public class OTPController {
 	
 	private static final String OTPTYPE = "email-verification";

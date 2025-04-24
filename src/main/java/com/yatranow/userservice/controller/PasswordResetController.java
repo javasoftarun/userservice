@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class PasswordResetController {
 
     @Autowired
