@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +41,7 @@ public class UserController {
      */
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Registers a new user with the provided details")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody User user) {
+    public ResponseEntity<ApiResponse> registerUser(@RequestBody @Validated User user) {
         System.out.println("Registering user: " + user.toString());
         User registeredUser = userService.registerUser(user);
         return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
@@ -76,7 +77,7 @@ public class UserController {
     
     @PatchMapping("/update")
     @Operation(summary = "Update user details", description = "Updates the user details based on JSON input")
-    public ResponseEntity<ApiResponse> updateUserRole(@RequestBody User user) {
+    public ResponseEntity<ApiResponse> updateUserRole(@RequestBody @Validated User user) {
         try {
             User updatedUser = userService.updateUserDetails(user);
 

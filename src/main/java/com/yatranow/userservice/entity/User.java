@@ -1,6 +1,11 @@
 package com.yatranow.userservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,10 +14,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+	@NotNull
+	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
     private String name;
+	@Email(message = "Email should be valid")
     private String email;
+	@NotNull
+	@Size(min = 8, max = 25, message = "Password must be between 8 and 25 characters")
     private String password;
+
+	@NotNull
+	@Size(min = 10, max = 10, message = "Phone number must be between 10 and 15 characters")
+	@Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phone;
+	@NotNull
     private String role;
     private boolean verified;
     private String imageUrl;
