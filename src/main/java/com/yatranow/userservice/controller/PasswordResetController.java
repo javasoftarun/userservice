@@ -46,7 +46,7 @@ public class PasswordResetController {
     )
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody PasswordResetRequest request) {
         try {
-            passwordResetService.resetPassword(request.getOtp(), request.getNewPassword());
+            passwordResetService.resetPassword(request);
             return ResponseEntity.ok(new ApiResponse("Password reset successfully", null, 200));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(), null, 400));

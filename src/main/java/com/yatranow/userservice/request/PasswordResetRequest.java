@@ -14,6 +14,10 @@ public class PasswordResetRequest {
 	@Size(min = 8, max = 25, message = "Password must be between 8 and 25 characters")
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,25}$", message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
 	private String newPassword;
+	
+	@NotNull
+	private String username;
+	
 	public String getOtp() {
 		return otp;
 	}
@@ -25,6 +29,12 @@ public class PasswordResetRequest {
 	}
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 }

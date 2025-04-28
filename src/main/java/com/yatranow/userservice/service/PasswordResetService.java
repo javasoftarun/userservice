@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.yatranow.userservice.config.CommonUtils;
 import com.yatranow.userservice.entity.PasswordReset;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.PasswordResetRepository;
 import com.yatranow.userservice.repository.UserRepository;
+import com.yatranow.userservice.request.PasswordResetRequest;
 
 @Service
 public class PasswordResetService {
@@ -38,9 +38,11 @@ public class PasswordResetService {
 	 * @throws RuntimeException if the OTP is invalid or expired, or if the user is
 	 *                          not found.
 	 */
-	public void resetPassword(String otp, String newPassword) {
+	public void resetPassword(PasswordResetRequest request) throws RuntimeException {
 
-		PasswordReset passReset = resetRepository.findByOtp(otp).orElseThrow(() -> new RuntimeException("Invalid OTP"));
+		Long userId = userRepository.findByEmail(request.getUsername())
+				.orElseThrow(() -> new RuntimeException("User not found")).getId();
+		PasswordReset passReset = resetRepository.findByUserIdAndOtp(userId, request.getOtp()).orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
 		if (passReset.getExpirationTime().isBefore(LocalDateTime.now()) || passReset.isUsed()) {
 			throw new RuntimeException("OTP expired or already used");
@@ -49,7 +51,7 @@ public class PasswordResetService {
 		User user = userRepository.findById(passReset.getUserId())
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
-		user.setPassword(CommonUtils.encryptPassword(newPassword));
+		user.setPassword(request.getNewPassword());
 		userRepository.save(user);
 
 		passReset.setUsed(true);
