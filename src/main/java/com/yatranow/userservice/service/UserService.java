@@ -1,22 +1,32 @@
 package com.yatranow.userservice.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.UserRepository;
+import com.yatranow.userservice.request.LoginRequest;
+import com.yatranow.userservice.response.TokenResponse;
 
 @Service
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Value("${token.api.url}")
+	String tokenApiUrl;
 
 	/**
 	 * Registers a new user.
@@ -28,15 +38,13 @@ public class UserService {
 		if (userRepository.existsByPhone(user.getPhone())) {
 			throw new IllegalArgumentException("Mobile is already in use");
 		}
-
-		if(!user.getRole().equalsIgnoreCase("USER") && !user.getRole().equalsIgnoreCase("VENDOR")) {
-			user.setPassword(user.getPassword());
-		}
 		if (user.getRole().equalsIgnoreCase("ADMIN")) {
-			if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().length() < 8) {
-				throw new IllegalArgumentException("Password is required for admin role");
+			if (userRepository.existsByEmail(user.getEmail())) {
+				throw new IllegalArgumentException("Email is already in use");
 			}
-			user.setPassword(user.getPassword());
+			if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().length() < 8) {
+				throw new IllegalArgumentException("Password is required for Admin role");
+			}
 		}
 
 		return userRepository.save(user);
@@ -96,5 +104,30 @@ public class UserService {
 		}
 		return userRepository.findByPhone(mobile);
 	}
+	
+	public String loginAndFetchToken(LoginRequest loginRequest) {
+		Map<String, String> tokenRequest = new HashMap<>();
+        // Validate username/email and password
+        User user = validateUserCredentials(loginRequest.getUsername(), loginRequest.getPassword())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+        // Get the user's mobile number
+        String mobileNumber = user.getPhone();
+
+        // Call external API to get the token
+        RestTemplate restTemplate = new RestTemplate();
+        tokenRequest.put("mobile", mobileNumber);
+        ResponseEntity<TokenResponse> tokenResponse = restTemplate.postForEntity(tokenApiUrl, tokenRequest, TokenResponse.class);
+
+        if (tokenResponse.getStatusCode() == HttpStatus.OK && tokenResponse.getBody() != null) {
+            return tokenResponse.getBody().getToken();
+        } else {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve token");
+        }
+    }
+
+    public Optional<User> validateUserCredentials(String username, String password) {
+        // Implement validation logic (e.g., check database for user credentials)
+        return userRepository.findByUsernameAndPassword(username, password);
+    }
 
 }

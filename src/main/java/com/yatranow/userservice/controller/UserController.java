@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.yatranow.userservice.entity.User;
+import com.yatranow.userservice.request.LoginRequest;
 import com.yatranow.userservice.response.ApiResponse;
 import com.yatranow.userservice.service.UserService;
 
@@ -94,5 +95,21 @@ public class UserController {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 		return ResponseEntity.ok(new ApiResponse("success", new Object[] { user }, HttpStatus.OK.value()));
     }
+    
+    @PostMapping("/login")
+    @Operation(summary = "User/Admin Login", description = "Logs in a user using username/email and password")
+    public ResponseEntity<ApiResponse> loginUser(@RequestBody LoginRequest loginRequest) {
+        try {
+            String token = userService.loginAndFetchToken(loginRequest);
+            return ResponseEntity.ok(new ApiResponse("success", new Object[] { token }, HttpStatus.OK.value()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ApiResponse(e.getReason(), null, e.getStatusCode().value()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(e.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        }
+    }
+
 
 }
