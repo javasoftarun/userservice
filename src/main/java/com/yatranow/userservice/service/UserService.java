@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.UserRepository;
 import com.yatranow.userservice.request.LoginRequest;
+import com.yatranow.userservice.response.LoginResponse;
 import com.yatranow.userservice.response.TokenResponse;
 
 @Service
@@ -105,8 +106,9 @@ public class UserService {
 		return userRepository.findByPhone(mobile);
 	}
 	
-	public String loginAndFetchToken(LoginRequest loginRequest) {
+	public LoginResponse loginAndFetchToken(LoginRequest loginRequest) {
 		Map<String, String> tokenRequest = new HashMap<>();
+		LoginResponse loginResponse = new LoginResponse();
         // Validate username/email and password
         User user = validateUserCredentials(loginRequest.getUsername(), loginRequest.getPassword())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
@@ -119,7 +121,13 @@ public class UserService {
         ResponseEntity<TokenResponse> tokenResponse = restTemplate.postForEntity(tokenApiUrl, tokenRequest, TokenResponse.class);
 
         if (tokenResponse.getStatusCode() == HttpStatus.OK && tokenResponse.getBody() != null) {
-            return tokenResponse.getBody().getToken();
+        	loginResponse.setUserId(user.getId());
+        	loginResponse.setName(user.getName());
+        	loginResponse.setEmail(user.getEmail());
+        	loginResponse.setPhone(user.getPhone());
+        	loginResponse.setRole(user.getRole());
+        	loginResponse.setToken(tokenResponse.getBody().getToken());
+            return loginResponse;
         } else {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve token");
         }

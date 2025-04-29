@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.request.LoginRequest;
 import com.yatranow.userservice.response.ApiResponse;
+import com.yatranow.userservice.response.LoginResponse;
 import com.yatranow.userservice.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,8 +101,8 @@ public class UserController {
     @Operation(summary = "User/Admin Login", description = "Logs in a user using username/email and password")
     public ResponseEntity<ApiResponse> loginUser(@RequestBody LoginRequest loginRequest) {
         try {
-            String token = userService.loginAndFetchToken(loginRequest);
-            return ResponseEntity.ok(new ApiResponse("success", new Object[] { token }, HttpStatus.OK.value()));
+            LoginResponse response = userService.loginAndFetchToken(loginRequest);
+            return ResponseEntity.ok(new ApiResponse("success", new Object[] { response }, HttpStatus.OK.value()));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode())
                     .body(new ApiResponse(e.getReason(), null, e.getStatusCode().value()));
