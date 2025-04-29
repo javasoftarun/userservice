@@ -8,6 +8,7 @@ public class LoginResponse {
     private String phone;
     private String role;
     private String token;
+    private String imageUrl;
     
 	public Long getUserId() {
 		return userId;
@@ -44,5 +45,11 @@ public class LoginResponse {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 }

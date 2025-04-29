@@ -126,6 +126,7 @@ public class UserService {
         	loginResponse.setEmail(user.getEmail());
         	loginResponse.setPhone(user.getPhone());
         	loginResponse.setRole(user.getRole());
+        	loginResponse.setImageUrl(user.getImageUrl());
         	loginResponse.setToken(tokenResponse.getBody().getToken());
             return loginResponse;
         } else {
