@@ -40,16 +40,13 @@ public class PasswordResetService {
 	 */
 	public void resetPassword(PasswordResetRequest request) throws RuntimeException {
 
-		Long userId = userRepository.findByEmail(request.getUsername())
-				.orElseThrow(() -> new RuntimeException("User not found")).getId();
-		PasswordReset passReset = resetRepository.findByUserIdAndOtp(userId, request.getOtp()).orElseThrow(() -> new RuntimeException("Invalid OTP"));
+		User user = userRepository.findByEmail(request.getUsername())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+		PasswordReset passReset = resetRepository.findByUserIdAndOtp(user.getId(), request.getOtp()).orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
 		if (passReset.getExpirationTime().isBefore(LocalDateTime.now()) || passReset.isUsed()) {
 			throw new RuntimeException("OTP expired or already used");
 		}
-
-		User user = userRepository.findById(passReset.getUserId())
-				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		user.setPassword(request.getNewPassword());
 		userRepository.save(user);

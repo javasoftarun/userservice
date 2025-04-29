@@ -19,8 +19,6 @@ public class User {
     private String name;
 	@Email(message = "Email should be valid")
     private String email;
-	@NotNull
-	@Size(min = 8, max = 25, message = "Password must be between 8 and 25 characters")
     private String password;
 
 	@NotNull
