@@ -87,13 +87,17 @@ public class UserService {
 	    
 		return userRepository.findById(user.getId()).map(existingUser -> {
 			existingUser.setName(user.getName());
-			if (userRepository.existsByEmail(user.getEmail())) {
-				throw new IllegalArgumentException("Email is already in use");
-			} else {
+			if ((user.getEmail()!=null || !user.getEmail().isEmpty()) && !existingUser.getEmail().equalsIgnoreCase(user.getEmail())) {
+				if (userRepository.existsByEmail(user.getEmail())) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already in use");
+				}
 				existingUser.setEmail(user.getEmail());
-			}
+			} 
 			if (user.getRole().equalsIgnoreCase("ADMIN")) {
-				if (user.getPhone() != null || !user.getPhone().isEmpty()) {
+				if ((user.getPhone() != null || !user.getPhone().isEmpty()) && !existingUser.getPhone().equalsIgnoreCase(user.getPhone())) {
+					if (userRepository.existsByPhone(user.getPhone())) {
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mobile is already in use");
+					}
 					existingUser.setPhone(user.getPhone());
 				}
 			}
