@@ -1,6 +1,7 @@
 package com.yatranow.userservice.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,11 +80,24 @@ public class UserController {
     
     @PatchMapping("/update")
     @Operation(summary = "Update user details", description = "Updates the user details based on JSON input")
-    public ResponseEntity<ApiResponse> updateUserRole(@RequestBody @Validated User user) {
+    public ResponseEntity<ApiResponse> updateUser(@RequestBody @Validated User user) {
         try {
             User updatedUser = userService.updateUserDetails(user);
 
             return ResponseEntity.ok(new ApiResponse("success", new Object[] {updatedUser}, HttpStatus.OK.value()));
+        } catch (Exception e) {
+        	return ResponseEntity.status(500).body(new ApiResponse(e.getMessage(), null, 500));
+        }
+    }
+    
+    
+    @PatchMapping("/update/password")
+    @Operation(summary = "Update user password", description = "Updates the user password based on JSON input")
+    public ResponseEntity<ApiResponse> updateUserPassword(@RequestBody Map<String, String> request) {
+        try {
+            String response = userService.updateUserPassword(request);
+
+            return ResponseEntity.ok(new ApiResponse("success", new Object[] {response}, HttpStatus.OK.value()));
         } catch (Exception e) {
         	return ResponseEntity.status(500).body(new ApiResponse(e.getMessage(), null, 500));
         }

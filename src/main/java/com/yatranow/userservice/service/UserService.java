@@ -87,7 +87,17 @@ public class UserService {
 	    
 		return userRepository.findById(user.getId()).map(existingUser -> {
 			existingUser.setName(user.getName());
-			existingUser.setEmail(user.getEmail());
+			if (userRepository.existsByEmail(user.getEmail())) {
+				throw new IllegalArgumentException("Email is already in use");
+			} else {
+				existingUser.setEmail(user.getEmail());
+			}
+			if (user.getRole().equalsIgnoreCase("ADMIN")) {
+				if (user.getPhone() != null || !user.getPhone().isEmpty()) {
+					existingUser.setPhone(user.getPhone());
+				}
+			}
+			
 			existingUser.setImageUrl(user.getImageUrl());
 			userRepository.save(existingUser);
 			return existingUser;
@@ -138,5 +148,28 @@ public class UserService {
         // Implement validation logic (e.g., check database for user credentials)
         return userRepository.findByUsernameAndPassword(username, password);
     }
+
+    
+	public String updateUserPassword(Map<String, String> request) {
+		String userId = request.get("userId");
+		String oldPassword = request.get("oldPassword");
+		String newPassword = request.get("newPassword");
+		if (userId == null || oldPassword == null || newPassword == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID, old password, and new password are required");
+		} else if (userId.isEmpty() || oldPassword.isEmpty() || newPassword.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID, old password, and new password cannot be empty");
+		} else if (newPassword.length() < 8) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must be at least 8 characters long");
+		} else if (!userRepository.existsById(Long.parseLong(userId))) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+		} else if (!userRepository.existsByPassword(oldPassword)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Old password is incorrect");
+		} else {
+			User user = userRepository.findById(Long.parseLong(userId)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+			user.setPassword(newPassword);
+			userRepository.save(user);
+			return "Password updated successfully";
+		}
+	}
 
 }
