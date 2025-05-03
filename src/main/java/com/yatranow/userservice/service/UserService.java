@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.UserRepository;
 import com.yatranow.userservice.request.LoginRequest;
+import com.yatranow.userservice.request.Notification;
 import com.yatranow.userservice.response.LoginResponse;
 import com.yatranow.userservice.response.TokenResponse;
 
@@ -26,8 +27,14 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private RestTemplate restTemplate;
+	
 	@Value("${token.api.url}")
 	String tokenApiUrl;
+	
+	@Value("${notification.api.url}")
+	String notificationApiUrl;
 
 	/**
 	 * Registers a new user.
@@ -174,6 +181,18 @@ public class UserService {
 			userRepository.save(user);
 			return "Password updated successfully";
 		}
+	}
+
+	public void sendNotification(User registeredUser) {
+        Notification notification = new Notification();
+        notification.setName(registeredUser.getName());
+        notification.setMessage("New user registered");
+        notification.setRead(false);
+        notification.setUserId(registeredUser.getId());
+        notification.setType("USER_REGISTRATION");
+
+        restTemplate.postForObject(notificationApiUrl, notification, String.class);
+		
 	}
 
 }

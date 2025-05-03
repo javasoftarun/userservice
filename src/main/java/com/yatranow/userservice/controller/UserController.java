@@ -47,6 +47,9 @@ public class UserController {
     public ResponseEntity<ApiResponse> registerUser(@RequestBody @Validated User user) {
         System.out.println("Registering user: " + user.toString());
         User registeredUser = userService.registerUser(user);
+        if (registeredUser != null) {
+        	userService.sendNotification(registeredUser);
+		}
         return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
     }
    	
