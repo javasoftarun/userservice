@@ -48,7 +48,12 @@ public class UserController {
         System.out.println("Registering user: " + user.toString());
         User registeredUser = userService.registerUser(user);
         if (registeredUser != null) {
-        	userService.sendNotification(registeredUser);
+        	try {
+        		userService.sendNotification(registeredUser);
+			} catch (Exception e) {
+				return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
+			}
+        	
 		}
         return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
     }
