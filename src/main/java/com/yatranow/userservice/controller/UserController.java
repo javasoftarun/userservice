@@ -119,6 +119,14 @@ public class UserController {
 		return ResponseEntity.ok(new ApiResponse("success", new Object[] { user }, HttpStatus.OK.value()));
     }
     
+    @GetMapping("/find/email/{email}")
+    @Operation(summary = "Get user by mobile", description = "Retrieves a user by their email")
+    public ResponseEntity<ApiResponse> getUserByEmail(@PathVariable("email") String email) {
+		User user = userService.getUserByEmail(email)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		return ResponseEntity.ok(new ApiResponse("success", new Object[] { user }, HttpStatus.OK.value()));
+    }
+    
     @PostMapping("/login")
     @Operation(summary = "User/Admin Login", description = "Logs in a user using username/email and password")
     public ResponseEntity<ApiResponse> loginUser(@RequestBody LoginRequest loginRequest) {
