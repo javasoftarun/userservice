@@ -49,7 +49,7 @@ public class UserController {
         User registeredUser = userService.registerUser(user);
         if (registeredUser != null) {
         	try {
-        		userService.sendNotification(registeredUser);
+        		userService.sendNotification(registeredUser.getFcmToken(), registeredUser.getName());
 			} catch (Exception e) {
 				return ResponseEntity.ok(new ApiResponse("success", new Object[] {registeredUser}, HttpStatus.OK.value()));
 			}

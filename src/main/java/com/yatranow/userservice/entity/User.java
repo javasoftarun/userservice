@@ -28,6 +28,8 @@ public class User {
     private String role;
     private boolean verified;
     private String imageUrl;
+    
+    private String fcmToken;
 
     private String gender;
     private LocalDate dateOfBirth;
@@ -141,4 +143,12 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+	public String getFcmToken() {
+		return fcmToken;
+	}
+
+	public void setFcmToken(String fcmToken) {
+		this.fcmToken = fcmToken;
+	}
 }

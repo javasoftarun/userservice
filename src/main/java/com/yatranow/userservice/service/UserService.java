@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.yatranow.userservice.entity.User;
 import com.yatranow.userservice.repository.UserRepository;
 import com.yatranow.userservice.request.LoginRequest;
-import com.yatranow.userservice.request.Notification;
 import com.yatranow.userservice.response.LoginResponse;
 import com.yatranow.userservice.response.TokenResponse;
 
@@ -29,13 +28,19 @@ public class UserService {
 	private UserRepository userRepository;
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private FirebaseMessagingService firebaseService;
 
 	@Value("${token.api.url}")
 	String tokenApiUrl;
 
 	@Value("${notification.api.url}")
 	String notificationApiUrl;
+	
+	@Value("${addusertitle}")
+	String addUserTitle;
+	
+	@Value("${adduserbody}")
+	String addUserBody;
 
 	/**
 	 * Registers a new user.
@@ -196,15 +201,13 @@ public class UserService {
 		}
 	}
 
-	public void sendNotification(User registeredUser) {
-		Notification notification = new Notification();
-		notification.setName(registeredUser.getName());
-		notification.setMessage("New user registered");
-		notification.setRead(false);
-		notification.setUserId(registeredUser.getId());
-		notification.setType("USER_REGISTRATION");
-
-		restTemplate.postForObject(notificationApiUrl, notification, String.class);
+	public void sendNotification(String fcmToken, String username) {
+		try {
+			String response = firebaseService.sendNotification(fcmToken, addUserTitle+ " "+username, addUserBody);
+			System.out.println("response ::"+response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 

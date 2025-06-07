@@ -13,7 +13,9 @@ java {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
-
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.removeAll { it.contains('--enable-preview') }
+}
 repositories {
 	mavenCentral()
 }
@@ -29,6 +31,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 	implementation 'mysql:mysql-connector-java:8.0.33'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 }
 
