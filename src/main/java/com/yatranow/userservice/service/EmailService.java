@@ -74,7 +74,6 @@ public class EmailService {
 	 * @param otp the OTP to include in the email
 	 * @return the HTML email template as a string
 	 */
-	@SuppressWarnings("preview")
 	private String getPasswordResetEmailTemplate(String otp) {
 		return String.format("""
 				<!DOCTYPE html>
@@ -154,7 +153,6 @@ public class EmailService {
 	 * @param otp the OTP to include in the email
 	 * @return the HTML email template as a string
 	 */
-	@SuppressWarnings("preview")
 	private String getEmailVerificationTemplate(String otp) {
 		return String.format("""
 				<!DOCTYPE html>

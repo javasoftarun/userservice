@@ -12,15 +12,19 @@ import javax.annotation.PostConstruct;
 
 @Configuration
 public class FirebaseConfig {
-	@PostConstruct
-	public void initialize() throws IOException {
-		FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase-service-account.json");
+    @PostConstruct
+    public void initialize() {
+        try {
+            FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
-		FirebaseOptions options = new FirebaseOptions.Builder()
-				.setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
-
-		if (FirebaseApp.getApps().isEmpty()) {
-			FirebaseApp.initializeApp(options);
-		}
-	}
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
