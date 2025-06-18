@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.yatranow.userservice.entity.User;
+import com.yatranow.userservice.entity.UserQuery;
 import com.yatranow.userservice.request.LoginRequest;
 import com.yatranow.userservice.response.ApiResponse;
 import com.yatranow.userservice.response.LoginResponse;
+import com.yatranow.userservice.service.UserQueryService;
 import com.yatranow.userservice.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +37,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserQueryService queryService;
 
     /**
      * Registers a new user.
@@ -142,5 +147,24 @@ public class UserController {
         }
     }
 
+    
+    @PostMapping("/userquery")
+    @Operation(summary = "insert user query", description = "insert user query from contact page")
+    public ResponseEntity<ApiResponse> createUserQuery(@RequestBody UserQuery userQuery) {
+    	UserQuery response = null;
+    	try {
+    		 response = queryService.save(userQuery);
+    	} catch (Exception e) {
+    		return ResponseEntity.ok(new ApiResponse(e.getMessage(), new Object[] {response}, HttpStatus.OK.value()));
+		}
+        return ResponseEntity.ok(new ApiResponse("success", new Object[] {response}, HttpStatus.OK.value())); 
+    }
+    
+    @GetMapping("/userquery/all")
+    @Operation(summary = "Get all user queries", description = "Retrieves all user queries from the system")
+    public ResponseEntity<ApiResponse> getAllUserQueries() {
+        List<UserQuery> queries = queryService.findAll();
+        return ResponseEntity.ok(new ApiResponse("success", queries.toArray(), HttpStatus.OK.value()));
+    }
 
 }
